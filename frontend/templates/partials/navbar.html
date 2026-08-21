@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg navbar-dark navbar-floating py-3" id="mainNavbar">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-olive fs-4" href="#">
+            <i class="bi bi-heart-fill me-1"></i>EDUCAN
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav mx-auto gap-lg-2">
+                <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Nosotros</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'services' %}">Servicios</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'shop' %}">Tienda</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+            </ul>
+
+            <div class="dropdown" id="authButtonWrapper">
+                <a href="#" class="btn btn-olive rounded-pill px-4" id="authButton" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesión</a>
+                <ul class="dropdown-menu dropdown-menu-end d-none" id="authDropdownMenu">
+                    <li><a class="dropdown-item" href="/admin-panel/">Panel Admin</a></li>
+                    <li><a class="dropdown-item" href="#" id="logoutBtn">Cerrar sesión</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Servicios | EDUCAN{% endblock %}
+
+{% block content %}
+
+<!--encabezado de la página-->
+<section class="page-header">
+    <div class="page-header-overlay"></div>
+    <div class="container position-relative text-center text-white py-5">
+        <p class="text-uppercase fw-bold small mb-2" style="letter-spacing: 2px;">Lo que ofrecemos</p>
+        <h1 class="fw-bold display-5">Nuestros servicios</h1>
+        <p class="lead" style="opacity: 0.85;">Programas diseñados para cada etapa y necesidad de tu perro.</p>
+    </div>
+</section>
+
+<!--listado completo de servicios-->
+<section class="py-5 my-4">
+    <div class="container">
+        <div class="row g-4">
+            {% for s in servicios %}
+            <div class="col-md-6 col-lg-3">
+                <div class="service-card">
+                    <img src="{{ s.imagen|default:'https://images.unsplash.com/photo-1568572933382-74d440642117?w=500' }}" alt="{{ s.nombre }}">
+                    <div class="service-overlay">
+                        <h5>{{ s.nombre }}</h5>
+                        <p>{{ s.descripcion }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center text-muted">Aún no hay servicios registrados.</p>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="#" class="btn btn-olive btn-lg rounded-pill px-5">Agendar una sesión</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

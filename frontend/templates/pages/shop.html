@@ -1,0 +1,39 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Tienda | EDUCAN{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div class="page-header-overlay"></div>
+    <div class="container position-relative text-center text-white py-5">
+        <p class="text-uppercase fw-bold small mb-2" style="letter-spacing: 2px;">Tienda</p>
+        <h1 class="fw-bold display-5">Nuestros productos</h1>
+    </div>
+</section>
+
+<section class="py-5 my-4">
+    <div class="container">
+        <div class="row g-4">
+            {% for p in productos %}
+            <div class="col-md-4">
+                <div class="shop-card">
+                    <div class="shop-card-img">
+                        <img src="{{ p.imagen|default:'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500' }}" alt="{{ p.nombre }}">
+                    </div>
+                    <div class="text-center p-4">
+                        <h5 class="fw-bold mb-2">{{ p.nombre }}</h5>
+                        <p class="text-muted small mb-3">{{ p.descripcion }}</p>
+                        <p class="fw-bold text-olive mb-3">${{ p.precio }}</p>
+                        <a href="{% url 'shop' %}" class="btn btn-olive rounded-pill px-4">Ver producto</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center text-muted">Aún no hay productos registrados.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

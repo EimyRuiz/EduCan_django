@@ -1,0 +1,130 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Panel Admin | EDUCAN{% endblock %}
+{% block content %}
+<section class="py-5 my-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4">Panel de Administración</h2>
+        <div id="noAccess" class="alert alert-danger d-none">No tienes permiso para ver esta página.</div>
+
+        <div id="adminContent" class="d-none">
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabUsuarios">Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabServicios">Servicios</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabProductos">Productos</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="tabUsuarios">
+                    <table class="table"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></thead>
+                    <tbody id="usuariosBody"></tbody></table>
+                </div>
+                <div class="tab-pane fade" id="tabServicios">
+                    <form id="servicioForm" class="row g-2 mb-4">
+                        <div class="col-md-3"><input class="form-control" placeholder="Nombre" id="servNombre" required></div>
+                        <div class="col-md-4"><input class="form-control" placeholder="Descripción" id="servDescripcion" required></div>
+                        <div class="col-md-2"><input class="form-control" type="number" placeholder="Precio" id="servPrecio" required></div>
+                        <div class="col-md-3"><button class="btn btn-olive w-100">Agregar</button></div>
+                    </form>
+                    <table class="table"><thead><tr><th>Nombre</th><th>Precio</th><th></th></tr></thead>
+                    <tbody id="serviciosBody"></tbody></table>
+                </div>
+                <div class="tab-pane fade" id="tabProductos">
+                    <form id="productoForm" class="row g-2 mb-4">
+                        <div class="col-md-3"><input class="form-control" placeholder="Nombre" id="prodNombre" required></div>
+                        <div class="col-md-4"><input class="form-control" placeholder="Descripción" id="prodDescripcion" required></div>
+                        <div class="col-md-2"><input class="form-control" type="number" placeholder="Precio" id="prodPrecio" required></div>
+                        <div class="col-md-3"><button class="btn btn-olive w-100">Agregar</button></div>
+                    </form>
+                    <table class="table"><thead><tr><th>Nombre</th><th>Precio</th><th></th></tr></thead>
+                    <tbody id="productosBody"></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+{% load static %}
+<script src="{% static 'js/main.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const rol = localStorage.getItem('user_rol');
+    const token = localStorage.getItem('access_token');
+
+    if (rol !== 'administrador') {
+        document.getElementById('noAccess').classList.remove('d-none');
+        return;
+    }
+    document.getElementById('adminContent').classList.remove('d-none');
+
+    const API = 'http://127.0.0.1:8000/api';
+    const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+    fetch(`${API}/users/list/`, { headers })
+    .then(r => {
+        if (!r.ok) throw new Error('Status ' + r.status);
+        return r.json();
+    })
+    .then(usuarios => {
+        document.getElementById('usuariosBody').innerHTML = usuarios.map(u =>
+            `<tr><td>${u.nombre} ${u.apellido || ''}</td><td>${u.email}</td><td>${u.rol}</td></tr>`
+        ).join('');
+    })
+    .catch(err => {
+        console.error('Error cargando usuarios:', err);
+        document.getElementById('usuariosBody').innerHTML =
+            '<tr><td colspan="3" class="text-danger">Error al cargar usuarios: ' + err.message + '</td></tr>';
+    });
+
+    function cargarServicios() {
+        fetch(`${API}/services/`).then(r => r.json()).then(servicios => {
+            document.getElementById('serviciosBody').innerHTML = servicios.map(s =>
+                `<tr><td>${s.nombre}</td><td>$${s.precio}</td><td><button class="btn btn-sm btn-outline-danger" onclick="eliminarServicio('${s.id}')">Eliminar</button></td></tr>`
+            ).join('');
+        });
+    }
+    cargarServicios();
+
+    document.getElementById('servicioForm').onsubmit = function (e) {
+        e.preventDefault();
+        fetch(`${API}/services/`, {
+            method: 'POST', headers,
+            body: JSON.stringify({
+                nombre: document.getElementById('servNombre').value,
+                descripcion: document.getElementById('servDescripcion').value,
+                precio: parseFloat(document.getElementById('servPrecio').value)
+            })
+        }).then(() => { this.reset(); cargarServicios(); });
+    };
+
+    window.eliminarServicio = function (id) {
+        fetch(`${API}/services/${id}/`, { method: 'DELETE', headers }).then(() => cargarServicios());
+    };
+
+    function cargarProductos() {
+        fetch(`${API}/products/`).then(r => r.json()).then(productos => {
+            document.getElementById('productosBody').innerHTML = productos.map(p =>
+                `<tr><td>${p.nombre}</td><td>$${p.precio}</td><td><button class="btn btn-sm btn-outline-danger" onclick="eliminarProducto('${p.id}')">Eliminar</button></td></tr>`
+            ).join('');
+        });
+    }
+    cargarProductos();
+
+    document.getElementById('productoForm').onsubmit = function (e) {
+        e.preventDefault();
+        fetch(`${API}/products/`, {
+            method: 'POST', headers,
+            body: JSON.stringify({
+                nombre: document.getElementById('prodNombre').value,
+                descripcion: document.getElementById('prodDescripcion').value,
+                precio: parseFloat(document.getElementById('prodPrecio').value)
+            })
+        }).then(() => { this.reset(); cargarProductos(); });
+    };
+
+    window.eliminarProducto = function (id) {
+        fetch(`${API}/products/${id}/`, { method: 'DELETE', headers }).then(() => cargarProductos());
+    };
+});
+</script>
+{% endblock %}
+{% endblock %}

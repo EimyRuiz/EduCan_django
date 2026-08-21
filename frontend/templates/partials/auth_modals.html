@@ -1,0 +1,74 @@
+<!-- Modal Login -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Iniciar sesión</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="loginError" class="alert alert-danger d-none"></div>
+        <form id="loginForm">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="loginEmail" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="loginPassword" required>
+          </div>
+          <button type="submit" class="btn btn-olive w-100 rounded-pill">Entrar</button>
+        </form>
+        <p class="text-center small mt-3 mb-0">
+          ¿No tienes cuenta? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Regístrate</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Registro -->
+<div class="modal fade" id="registerModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Crear cuenta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="registerError" class="alert alert-danger d-none"></div>
+        <form id="registerForm">
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="registerNombre" required>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="registerApellido" required>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" id="registerEmail" required>
+    </div>
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label class="form-label">Teléfono</label>
+            <input type="tel" class="form-control" id="registerTelefono" required>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="form-label">Ciudad</label>
+            <input type="text" class="form-control" id="registerCiudad">
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-control" id="registerPassword" minlength="6" required>
+    </div>
+    <button type="submit" class="btn btn-olive w-100 rounded-pill">Registrarme</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
