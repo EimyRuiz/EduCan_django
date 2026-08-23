@@ -2,7 +2,12 @@ from django.shortcuts import render
 from apps.core.mongo import db
 # Create your views here.
 def home(request):
-    return render(request, 'pages/home.html')
+    servicios = list(db.servicios.find().limit(4))
+    productos = list(db.productos.find().limit(3))
+    return render(request, 'pages/home.html', {
+        'servicios': servicios,
+        'productos': productos,
+    })
 
 
 def services(request):

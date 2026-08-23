@@ -1,46 +1,136 @@
-{% extends 'layouts/base.html' %}
+{% extends 'layouts/base_admin.html' %}
 {% block title %}Panel Admin | EDUCAN{% endblock %}
-{% block content %}
-<section class="py-5 my-5">
-    <div class="container">
-        <h2 class="fw-bold mb-4">Panel de Administración</h2>
-        <div id="noAccess" class="alert alert-danger d-none">No tienes permiso para ver esta página.</div>
 
-        <div id="adminContent" class="d-none">
-            <ul class="nav nav-tabs mb-4">
-                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabUsuarios">Usuarios</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabServicios">Servicios</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabProductos">Productos</a></li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="tabUsuarios">
-                    <table class="table"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></thead>
-                    <tbody id="usuariosBody"></tbody></table>
+{% block content %}
+<div id="noAccess" class="alert alert-danger d-none m-5">No tienes permiso para ver esta página.</div>
+
+<div id="adminContent" class="admin-dashboard d-none">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <i class="bi bi-heart-fill me-1"></i> EDUCAN
+        </div>
+        <nav class="admin-nav">
+            <a href="#" class="admin-nav-link active" data-section="resumen"><i class="bi bi-grid-1x2-fill"></i> Resumen</a>
+            <a href="#" class="admin-nav-link" data-section="usuarios"><i class="bi bi-people-fill"></i> Usuarios</a>
+            <a href="#" class="admin-nav-link" data-section="servicios"><i class="bi bi-clipboard2-pulse-fill"></i> Servicios</a>
+            <a href="#" class="admin-nav-link" data-section="productos"><i class="bi bi-bag-fill"></i> Productos</a>
+        </nav>
+        <a href="/" class="admin-nav-link mt-auto"><i class="bi bi-box-arrow-left"></i> Volver al sitio</a>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="admin-main">
+        <div class="admin-topbar">
+            <div>
+                <h4 class="fw-bold mb-0" id="welcomeText">Bienvenido</h4>
+                <span class="text-muted small">Panel de administración de EDUCAN</span>
+            </div>
+            <div class="admin-avatar" id="adminAvatar">A</div>
+        </div>
+
+        <!-- Resumen -->
+        <section class="admin-section" id="section-resumen">
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="admin-stat-card admin-stat-dark">
+                        <span class="admin-stat-label"><i class="bi bi-people-fill me-1"></i> Usuarios</span>
+                        <h2 id="statUsuarios">0</h2>
+                    </div>
                 </div>
-                <div class="tab-pane fade" id="tabServicios">
-                    <form id="servicioForm" class="row g-2 mb-4">
-                        <div class="col-md-3"><input class="form-control" placeholder="Nombre" id="servNombre" required></div>
-                        <div class="col-md-4"><input class="form-control" placeholder="Descripción" id="servDescripcion" required></div>
-                        <div class="col-md-2"><input class="form-control" type="number" placeholder="Precio" id="servPrecio" required></div>
-                        <div class="col-md-3"><button class="btn btn-olive w-100">Agregar</button></div>
-                    </form>
-                    <table class="table"><thead><tr><th>Nombre</th><th>Precio</th><th></th></tr></thead>
-                    <tbody id="serviciosBody"></tbody></table>
+                <div class="col-md-4">
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-label"><i class="bi bi-clipboard2-pulse-fill me-1"></i> Servicios</span>
+                        <h2 id="statServicios">0</h2>
+                    </div>
                 </div>
-                <div class="tab-pane fade" id="tabProductos">
-                    <form id="productoForm" class="row g-2 mb-4">
-                        <div class="col-md-3"><input class="form-control" placeholder="Nombre" id="prodNombre" required></div>
-                        <div class="col-md-4"><input class="form-control" placeholder="Descripción" id="prodDescripcion" required></div>
-                        <div class="col-md-2"><input class="form-control" type="number" placeholder="Precio" id="prodPrecio" required></div>
-                        <div class="col-md-3"><button class="btn btn-olive w-100">Agregar</button></div>
-                    </form>
-                    <table class="table"><thead><tr><th>Nombre</th><th>Precio</th><th></th></tr></thead>
-                    <tbody id="productosBody"></tbody></table>
+                <div class="col-md-4">
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-label"><i class="bi bi-bag-fill me-1"></i> Productos</span>
+                        <h2 id="statProductos">0</h2>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
+            <div class="admin-card">
+                <h6 class="fw-bold mb-3">Bienvenido al panel</h6>
+                <p class="text-muted mb-0">Desde aquí puedes gestionar usuarios, servicios y productos de EDUCAN. Usa el menú lateral para navegar entre secciones.</p>
+            </div>
+        </section>
+
+        <!-- Usuarios -->
+        <section class="admin-section d-none" id="section-usuarios">
+            <div class="admin-card">
+                <h6 class="fw-bold mb-3">Usuarios registrados</h6>
+                <table class="table admin-table">
+                    <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></thead>
+                    <tbody id="usuariosBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Servicios -->
+        <section class="admin-section d-none" id="section-servicios">
+            <div class="admin-card mb-4">
+                <h6 class="fw-bold mb-3">Agregar / editar servicio</h6>
+                <form id="servicioForm" class="row g-2">
+                    <input type="hidden" id="servId" value="">
+                    <div class="col-md-3">
+                        <select class="form-select" id="servNombre" required>
+                            <option value="" disabled selected>Selecciona un servicio</option>
+                            <option value="Adiestramiento básico">Adiestramiento básico</option>
+                            <option value="Modificación de conducta">Modificación de conducta</option>
+                            <option value="Entrenamiento avanzado">Entrenamiento avanzado</option>
+                            <option value="Paseos y ejercicio">Paseos y ejercicio</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4"><input class="form-control" placeholder="Descripción" id="servDescripcion" required></div>
+                    <div class="col-md-2"><input class="form-control" type="number" placeholder="Precio" id="servPrecio" required></div>
+                    <div class="col-md-3"><button class="btn btn-olive w-100" id="servSubmitBtn">Agregar</button></div>
+                </form>
+            </div>
+            <div class="admin-card">
+                <h6 class="fw-bold mb-3">Servicios existentes</h6>
+                <table class="table admin-table">
+                    <thead><tr><th>Nombre</th><th>Precio</th><th></th></tr></thead>
+                    <tbody id="serviciosBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Productos -->
+        <section class="admin-section d-none" id="section-productos">
+            <div class="admin-card mb-4">
+                <h6 class="fw-bold mb-3">Agregar / editar producto</h6>
+                <form id="productoForm" class="row g-2">
+                    <input type="hidden" id="prodId" value="">
+                    <div class="col-md-3">
+                        <select class="form-select" id="prodNombre" required>
+                            <option value="" disabled selected>Selecciona un producto</option>
+                            <option value="Collar">Collar</option>
+                            <option value="Pechera">Pechera</option>
+                            <option value="Correa">Correa</option>
+                            <option value="Impermeable">Impermeable</option>
+                            <option value="Juguete">Juguete</option>
+                            <option value="Comida">Comida</option>
+                            <option value="Producto de aseo">Producto de aseo</option>
+                            <option value="Accesorio">Accesorio</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4"><input class="form-control" placeholder="Descripción" id="prodDescripcion" required></div>
+                    <div class="col-md-2"><input class="form-control" type="number" placeholder="Precio" id="prodPrecio" required></div>
+                    <div class="col-md-3"><button class="btn btn-olive w-100" id="prodSubmitBtn">Agregar</button></div>
+                </form>
+            </div>
+            <div class="admin-card">
+                <h6 class="fw-bold mb-3">Productos existentes</h6>
+                <table class="table admin-table">
+                    <thead><tr><th>Nombre</th><th>Precio</th><th></th></tr></thead>
+                    <tbody id="productosBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
 
 {% block extra_js %}
 {% load static %}
@@ -49,76 +139,141 @@
 document.addEventListener('DOMContentLoaded', function () {
     const rol = localStorage.getItem('user_rol');
     const token = localStorage.getItem('access_token');
+    const nombre = localStorage.getItem('user_nombre') || 'Admin';
 
     if (rol !== 'administrador') {
         document.getElementById('noAccess').classList.remove('d-none');
         return;
     }
     document.getElementById('adminContent').classList.remove('d-none');
+    document.getElementById('welcomeText').textContent = 'Bienvenido, ' + nombre;
+    document.getElementById('adminAvatar').textContent = nombre.charAt(0).toUpperCase();
+
+    // Navegación entre secciones
+    document.querySelectorAll('.admin-nav-link[data-section]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelectorAll('.admin-nav-link[data-section]').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('d-none'));
+            document.getElementById('section-' + this.dataset.section).classList.remove('d-none');
+        });
+    });
 
     const API = 'http://127.0.0.1:8000/api';
     const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
-    fetch(`${API}/users/list/`, { headers })
-    .then(r => {
-        if (!r.ok) throw new Error('Status ' + r.status);
-        return r.json();
-    })
-    .then(usuarios => {
-        document.getElementById('usuariosBody').innerHTML = usuarios.map(u =>
-            `<tr><td>${u.nombre} ${u.apellido || ''}</td><td>${u.email}</td><td>${u.rol}</td></tr>`
-        ).join('');
-    })
-    .catch(err => {
-        console.error('Error cargando usuarios:', err);
-        document.getElementById('usuariosBody').innerHTML =
-            '<tr><td colspan="3" class="text-danger">Error al cargar usuarios: ' + err.message + '</td></tr>';
-    });
+    // --- Usuarios ---
+    function cargarUsuarios() {
+        fetch(`${API}/users/list/`, { headers })
+            .then(r => { if (!r.ok) throw new Error('Status ' + r.status); return r.json(); })
+            .then(usuarios => {
+                document.getElementById('statUsuarios').textContent = usuarios.length;
+                document.getElementById('usuariosBody').innerHTML = usuarios.map(u =>
+                    `<tr><td>${u.nombre} ${u.apellido || ''}</td><td>${u.email}</td><td>${u.rol}</td></tr>`
+                ).join('');
+            })
+            .catch(err => {
+                document.getElementById('usuariosBody').innerHTML =
+                    '<tr><td colspan="3" class="text-danger">Error: ' + err.message + '</td></tr>';
+            });
+    }
+    cargarUsuarios();
 
+    // --- Servicios ---
     function cargarServicios() {
         fetch(`${API}/services/`).then(r => r.json()).then(servicios => {
+            document.getElementById('statServicios').textContent = servicios.length;
             document.getElementById('serviciosBody').innerHTML = servicios.map(s =>
-                `<tr><td>${s.nombre}</td><td>$${s.precio}</td><td><button class="btn btn-sm btn-outline-danger" onclick="eliminarServicio('${s.id}')">Eliminar</button></td></tr>`
+                `<tr>
+                    <td>${s.nombre}</td>
+                    <td>$${formatearPrecioCOP(s.precio)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick='editarServicio(${JSON.stringify(s)})'>Editar</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="eliminarServicio('${s.id}')">Eliminar</button>
+                    </td>
+                </tr>`
             ).join('');
         });
     }
     cargarServicios();
 
+    window.editarServicio = function (servicio) {
+        document.getElementById('servId').value = servicio.id;
+        document.getElementById('servNombre').value = servicio.nombre;
+        document.getElementById('servDescripcion').value = servicio.descripcion;
+        document.getElementById('servPrecio').value = servicio.precio;
+        document.getElementById('servSubmitBtn').textContent = 'Guardar cambios';
+    };
+
     document.getElementById('servicioForm').onsubmit = function (e) {
         e.preventDefault();
-        fetch(`${API}/services/`, {
-            method: 'POST', headers,
-            body: JSON.stringify({
-                nombre: document.getElementById('servNombre').value,
-                descripcion: document.getElementById('servDescripcion').value,
-                precio: parseFloat(document.getElementById('servPrecio').value)
-            })
-        }).then(() => { this.reset(); cargarServicios(); });
+        const id = document.getElementById('servId').value;
+        const datos = {
+            nombre: document.getElementById('servNombre').value,
+            descripcion: document.getElementById('servDescripcion').value,
+            precio: parseFloat(document.getElementById('servPrecio').value)
+        };
+        const url = id ? `${API}/services/${id}/` : `${API}/services/`;
+        const metodo = id ? 'PUT' : 'POST';
+
+        fetch(url, { method: metodo, headers, body: JSON.stringify(datos) })
+            .then(() => {
+                this.reset();
+                document.getElementById('servId').value = '';
+                document.getElementById('servSubmitBtn').textContent = 'Agregar';
+                cargarServicios();
+            });
     };
 
     window.eliminarServicio = function (id) {
         fetch(`${API}/services/${id}/`, { method: 'DELETE', headers }).then(() => cargarServicios());
     };
 
+    // --- Productos ---
     function cargarProductos() {
         fetch(`${API}/products/`).then(r => r.json()).then(productos => {
+            document.getElementById('statProductos').textContent = productos.length;
             document.getElementById('productosBody').innerHTML = productos.map(p =>
-                `<tr><td>${p.nombre}</td><td>$${p.precio}</td><td><button class="btn btn-sm btn-outline-danger" onclick="eliminarProducto('${p.id}')">Eliminar</button></td></tr>`
+                `<tr>
+                    <td>${p.nombre}</td>
+                    <td>$${formatearPrecioCOP(p.precio)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick='editarProducto(${JSON.stringify(p)})'>Editar</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="eliminarProducto('${p.id}')">Eliminar</button>
+                    </td>
+                </tr>`
             ).join('');
         });
     }
     cargarProductos();
 
+    window.editarProducto = function (producto) {
+        document.getElementById('prodId').value = producto.id;
+        document.getElementById('prodNombre').value = producto.nombre;
+        document.getElementById('prodDescripcion').value = producto.descripcion;
+        document.getElementById('prodPrecio').value = producto.precio;
+        document.getElementById('prodSubmitBtn').textContent = 'Guardar cambios';
+    };
+
     document.getElementById('productoForm').onsubmit = function (e) {
         e.preventDefault();
-        fetch(`${API}/products/`, {
-            method: 'POST', headers,
-            body: JSON.stringify({
-                nombre: document.getElementById('prodNombre').value,
-                descripcion: document.getElementById('prodDescripcion').value,
-                precio: parseFloat(document.getElementById('prodPrecio').value)
-            })
-        }).then(() => { this.reset(); cargarProductos(); });
+        const id = document.getElementById('prodId').value;
+        const datos = {
+            nombre: document.getElementById('prodNombre').value,
+            descripcion: document.getElementById('prodDescripcion').value,
+            precio: parseFloat(document.getElementById('prodPrecio').value)
+        };
+        const url = id ? `${API}/products/${id}/` : `${API}/products/`;
+        const metodo = id ? 'PUT' : 'POST';
+
+        fetch(url, { method: metodo, headers, body: JSON.stringify(datos) })
+            .then(() => {
+                this.reset();
+                document.getElementById('prodId').value = '';
+                document.getElementById('prodSubmitBtn').textContent = 'Agregar';
+                cargarProductos();
+            });
     };
 
     window.eliminarProducto = function (id) {

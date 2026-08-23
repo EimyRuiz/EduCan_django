@@ -354,3 +354,127 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     }
 }
 
+
+/* --- dashboard admin --- */
+.admin-dashboard {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 0;
+}
+
+.admin-sidebar {
+    width: 260px;
+    background: var(--color-olive-dark);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.2rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.admin-sidebar-brand {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    padding-top: 4rem;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.admin-nav-link:hover {
+    background: rgba(255,255,255,0.08);
+    color: white;
+}
+
+.admin-nav-link.active {
+    background: var(--color-olive);
+    color: white;
+    font-weight: 600;
+}
+
+.admin-main {
+    flex: 1;
+    margin-left: 260px;
+    padding: 2.5rem;
+    padding-top: 6.5rem;
+    background: var(--color-beige);
+    min-height: 100vh;
+}
+
+.admin-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.admin-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--color-olive);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.admin-stat-card {
+    background: white;
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.admin-stat-dark {
+    background: var(--color-olive-dark);
+    color: white;
+}
+
+.admin-stat-label {
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+.admin-stat-card h2 {
+    font-weight: 700;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.admin-card {
+    background: white;
+    border-radius: 18px;
+    padding: 1.8rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.admin-table thead {
+    border-bottom: 2px solid var(--color-beige);
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar { display: none; }
+    .admin-main { margin-left: 0; }
+}

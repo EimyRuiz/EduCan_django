@@ -1,3 +1,6 @@
+function formatearPrecioCOP(valor) {
+    return Math.round(valor).toLocaleString('es-CO');
+}
 // Espera a que todo el HTML esté cargado antes de ejecutar el script
 document.addEventListener('DOMContentLoaded', function () {
 

@@ -1,4 +1,5 @@
 {% extends 'layouts/base.html' %}
+{% load formato %}
 
 {% block title %}Servicios | EDUCAN{% endblock %}
 
@@ -25,6 +26,7 @@
                     <div class="service-overlay">
                         <h5>{{ s.nombre }}</h5>
                         <p>{{ s.descripcion }}</p>
+                        <p class="fw-bold">${{ s.precio|precio_cop }}</p>
                     </div>
                 </div>
             </div>

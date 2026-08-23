@@ -1,5 +1,6 @@
 <!--hero-->
 {% extends 'layouts/base.html' %}
+{% load formato %}
 
 {% block title %}Inicio | EDUCAN{% endblock %}
 
@@ -124,42 +125,20 @@
             <h2 class="fw-bold">Nuestros servicios</h2>
         </div>
         <div class="row g-4">
+            {% for s in servicios %}
             <div class="col-md-6 col-lg-3">
-                <div class="service-card" data-title="Adiestramiento básico" data-text="Órdenes básicas para una convivencia equilibrada.">
-                    <img src="https://images.unsplash.com/photo-1568572933382-74d440642117?w=500" alt="Adiestramiento básico">
+                <div class="service-card" data-title="{{ s.nombre }}" data-text="{{ s.descripcion }}">
+                    <img src="{{ s.imagen|default:'https://images.unsplash.com/photo-1568572933382-74d440642117?w=500' }}" alt="{{ s.nombre }}">
                     <div class="service-overlay">
-                        <h5>Adiestramiento básico</h5>
-                        <p>Órdenes básicas para una convivencia equilibrada.</p>
+                        <h5>{{ s.nombre }}</h5>
+                        <p>{{ s.descripcion }}</p>
+                        <p class="fw-bold text-olive mb-2">${{ s.precio|precio_cop }}</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="service-card" data-title="Modificación de conducta" data-text="Corregimos comportamientos no deseados.">
-                    <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500" alt="Modificación de conducta">
-                    <div class="service-overlay">
-                        <h5>Modificación de conducta</h5>
-                        <p>Corregimos comportamientos no deseados.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="service-card" data-title="Entrenamiento avanzado" data-text="Lleva las habilidades de tu perro al siguiente nivel.">
-                    <img src="https://images.unsplash.com/photo-1568393691622-c7ba131d63b4?w=500" alt="Entrenamiento avanzado">
-                    <div class="service-overlay">
-                        <h5>Entrenamiento avanzado</h5>
-                        <p>Lleva las habilidades de tu perro al siguiente nivel.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="service-card" data-title="Paseos y ejercicio" data-text="Actividad física y recreación para su bienestar.">
-                    <img src="https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?w=500" alt="Paseos y ejercicio">
-                    <div class="service-overlay">
-                        <h5>Paseos y ejercicio</h5>
-                        <p>Actividad física y recreación para su bienestar.</p>
-                    </div>
-                </div>
-            </div>
+            {% empty %}
+            <p class="text-center text-muted">Aún no hay servicios registrados.</p>
+            {% endfor %}
         </div>
         <div class="text-center mt-5">
             <a href="{% url 'services' %}" class="btn btn-olive rounded-pill px-4">Ver todos los servicios</a>
@@ -176,42 +155,22 @@
             <h2 class="fw-bold">Nuestra tienda</h2>
         </div>
         <div class="row g-4">
+            {% for p in productos %}
             <div class="col-md-4">
                 <div class="shop-card">
                     <div class="shop-card-img">
-                        <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500" alt="Accesorios premium">
+                        <img src="{{ p.imagen|default:'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500' }}" alt="{{ p.nombre }}">
                     </div>
                     <div class="text-center p-4">
-                        <h5 class="fw-bold mb-2">Accesorios premium</h5>
-                        <p class="text-muted small mb-3">Collares, correas y juguetes de alta calidad.</p>
+                        <h5 class="fw-bold mb-2">{{ p.nombre }}</h5>
+                        <p class="text-muted small mb-3">{{ p.descripcion }}</p>
                         <a href="{% url 'shop' %}" class="btn btn-olive rounded-pill px-4">Ver producto</a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="shop-card">
-                    <div class="shop-card-img">
-                        <img src="https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?w=500" alt="Snacks saludables">
-                    </div>
-                    <div class="text-center p-4">
-                        <h5 class="fw-bold mb-2">Snacks saludables</h5>
-                        <p class="text-muted small mb-3">Premios naturales para reforzar su aprendizaje.</p>
-                        <a href="#" class="btn btn-outline-secondary rounded-pill px-4">Ver producto</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="shop-card">
-                    <div class="shop-card-img">
-                        <img src="https://images.unsplash.com/photo-1601758003122-53c40e686a19?w=500" alt="Planes exclusivos">
-                    </div>
-                    <div class="text-center p-4">
-                        <h5 class="fw-bold mb-2">Planes exclusivos</h5>
-                        <p class="text-muted small mb-3">Paquetes de entrenamiento con beneficios especiales.</p>
-                        <a href="#" class="btn btn-olive rounded-pill px-4">Ver producto</a>
-                    </div>
-                </div>
-            </div>
+            {% empty %}
+            <p class="text-center text-muted">Aún no hay productos registrados.</p>
+            {% endfor %}
         </div>
     </div>
 </section>
