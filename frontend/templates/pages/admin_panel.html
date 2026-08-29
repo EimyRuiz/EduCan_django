@@ -13,8 +13,11 @@
         <nav class="admin-nav">
             <a href="#" class="admin-nav-link active" data-section="resumen"><i class="bi bi-grid-1x2-fill"></i> Resumen</a>
             <a href="#" class="admin-nav-link" data-section="usuarios"><i class="bi bi-people-fill"></i> Usuarios</a>
+            <a href="#" class="admin-nav-link" data-section="pendientes"><i class="bi bi-person-check-fill"></i> Adiestradores</a>
             <a href="#" class="admin-nav-link" data-section="servicios"><i class="bi bi-clipboard2-pulse-fill"></i> Servicios</a>
             <a href="#" class="admin-nav-link" data-section="productos"><i class="bi bi-bag-fill"></i> Productos</a>
+            
+            <a href="#" class="admin-nav-link" data-section="configuracion"><i class="bi bi-gear-fill"></i> Configuración</a>
         </nav>
         <a href="/" class="admin-nav-link mt-auto"><i class="bi bi-box-arrow-left"></i> Volver al sitio</a>
     </aside>
@@ -64,6 +67,17 @@
                 <table class="table admin-table">
                     <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></thead>
                     <tbody id="usuariosBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Adiestradores pendientes -->
+        <section class="admin-section d-none" id="section-pendientes">
+            <div class="admin-card">
+                <h6 class="fw-bold mb-3">Adiestradores pendientes de aprobación</h6>
+                <table class="table admin-table">
+                <thead><tr><th>Nombre</th><th>Email</th><th>Certificado</th><th></th></tr></thead>
+                    <tbody id="pendientesBody"></tbody>
                 </table>
             </div>
         </section>
@@ -129,6 +143,24 @@
                 </table>
             </div>
         </section>
+
+        <!-- Configuración -->
+        <section class="admin-section d-none" id="section-configuracion">
+            <div class="admin-card">
+                <h6 class="fw-bold mb-3">Imágenes del sitio</h6>
+                <form id="configForm">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Banner del login (URL de imagen)</label>
+                        <input class="form-control" id="configLoginBanner" placeholder="https://...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Banner del registro (URL de imagen)</label>
+                        <input class="form-control" id="configRegisterBanner" placeholder="https://...">
+                    </div>
+                 <button class="btn btn-olive">Guardar configuración</button>
+               </form>
+            </div>
+        </section>
     </main>
 </div>
 
@@ -170,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(usuarios => {
                 document.getElementById('statUsuarios').textContent = usuarios.length;
                 document.getElementById('usuariosBody').innerHTML = usuarios.map(u =>
-                    `<tr><td>${u.nombre} ${u.apellido || ''}</td><td>${u.email}</td><td>${u.rol}</td></tr>`
+                    `<tr><td><img src="${u.foto || 'https://via.placeholder.com/40'}" class="rounded-circle me-2" width="35"> ${u.nombre} ${u.apellido || ''}</td><td>${u.email}</td><td>${u.rol}</td></tr>`
                 ).join('');
             })
             .catch(err => {
@@ -179,6 +211,34 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
     cargarUsuarios();
+
+
+    // --- Adiestradores pendientes ---
+    function cargarPendientes() {
+    fetch(`${API}/users/list/`, { headers }).then(r => r.json()).then(usuarios => {
+        const pendientes = usuarios.filter(u => u.rol === 'adiestrador' && u.estado_aprobacion === 'pendiente');
+        document.getElementById('pendientesBody').innerHTML = pendientes.length
+            ? pendientes.map(u => `
+                <tr>
+                    <td>${u.nombre} ${u.apellido || ''}</td>
+                    <td>${u.email}</td>
+                    <td>${u.certificado ? `<a href="${u.certificado}" target="_blank">Ver certificado</a>` : 'No adjuntado'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-olive me-1" onclick="aprobarAdiestrador('${u.id}', 'aprobar')">Aprobar</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="aprobarAdiestrador('${u.id}', 'rechazar')">Rechazar</button>
+                    </td>
+                </tr>`).join('')
+            : '<tr><td colspan="4" class="text-muted">No hay solicitudes pendientes.</td></tr>';
+    });
+}
+cargarPendientes();
+
+window.aprobarAdiestrador = function (id, accion) {
+    fetch(`${API}/users/aprobar/${id}/`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ accion })
+    }).then(() => { cargarPendientes(); cargarUsuarios(); });
+};
 
     // --- Servicios ---
     function cargarServicios() {
@@ -280,6 +340,25 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(`${API}/products/${id}/`, { method: 'DELETE', headers }).then(() => cargarProductos());
     };
 });
+
+function cargarConfiguracion() {
+    fetch(`${API}/config/`).then(r => r.json()).then(config => {
+        document.getElementById('configLoginBanner').value = config.login_banner || '';
+        document.getElementById('configRegisterBanner').value = config.register_banner || '';
+    });
+}
+cargarConfiguracion();
+
+document.getElementById('configForm').onsubmit = function (e) {
+    e.preventDefault();
+    fetch(`${API}/config/`, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+            login_banner: document.getElementById('configLoginBanner').value,
+            register_banner: document.getElementById('configRegisterBanner').value
+        })
+    }).then(() => alert('Configuración guardada.'));
+};
 </script>
 {% endblock %}
 {% endblock %}

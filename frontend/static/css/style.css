@@ -1,4 +1,47 @@
-/* --- hero --- */
+/* ============================================
+   VARIABLES GLOBALES DE COLOR Y TIPOGRAFÍA
+   Se usan en todo el sitio (botones, textos, fondos)
+   ============================================ */
+:root {
+    --color-olive: #7A8D28;
+    --color-olive-dark: #5C6B1E;
+    --color-beige: #F7F2EA;
+    --color-text: #333333;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    color: var(--color-text);
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: 'Poppins', sans-serif;
+}
+
+.text-olive {
+    color: var(--color-olive) !important;
+}
+
+.btn-olive {
+    background-color: var(--color-olive);
+    color: white;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+
+.btn-olive:hover {
+    background-color: var(--color-olive-dark);
+    color: white;
+}
+
+.bg-dark-olive {
+    background-color: var(--color-olive-dark);
+}
+
+
+/* ============================================
+   HERO (portada de Inicio)
+   ============================================ */
 .hero-section {
     position: relative;
     background-image: url('https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=1600');
@@ -38,44 +81,9 @@
 }
 
 
-:root {
-    --color-olive: #7A8D28;
-    --color-olive-dark: #5C6B1E;
-    --color-beige: #F7F2EA;
-    --color-text: #333333;
-}
-
-body {
-    font-family: 'Open Sans', sans-serif;
-    color: var(--color-text);
-}
-
-h1, h2, h3, h4, h5, h6, .navbar-brand {
-    font-family: 'Poppins', sans-serif;
-}
-
-.text-olive {
-    color: var(--color-olive) !important;
-}
-
-.btn-olive {
-    background-color: var(--color-olive);
-    color: white;
-    border: none;
-    transition: background-color 0.2s ease;
-}
-
-.btn-olive:hover {
-    background-color: var(--color-olive-dark);
-    color: white;
-}
-
-.bg-dark-olive {
-    background-color: var(--color-olive-dark);
-}
-
-
-/* --- navbar flotante tipo vidrio, siempre --- */
+/* ============================================
+   NAVBAR flotante tipo vidrio (visible en toda la página)
+   ============================================ */
 .navbar-floating {
     position: fixed;
     top: 0;
@@ -94,7 +102,9 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 }
 
 
-/* efectos tarjetas */
+/* ============================================
+   TARJETAS DESTACADAS de Inicio (las 4 de "Entrenamiento personalizado", etc.)
+   ============================================ */
 .feature-card {
     background: rgba(247, 242, 234, 0.6);
     backdrop-filter: blur(8px);
@@ -121,14 +131,14 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     margin: 0 auto;
 }
 
-/* --- tarjetas mordiendo el hero --- */
+/* Sección que "muerde" la parte de abajo del hero */
 .cards-overlap-section {
     margin-top: -100px;
     position: relative;
     z-index: 10;
 }
 
-/* --- scroll reveal --- */
+/* Animación de aparición al hacer scroll (usada junto con IntersectionObserver en main.js) */
 .reveal-up {
     opacity: 0;
     transform: translateY(40px);
@@ -140,7 +150,10 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     transform: translateY(0);
 }
 
-/* --- sección sobre educan --- */
+
+/* ============================================
+   SECCIÓN "SOBRE EDUCAN" (imagen + estadísticas animadas)
+   ============================================ */
 .about-image-wrapper {
     position: relative;
     padding-right: 20px;
@@ -206,6 +219,8 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     font-size: 0.75rem;
     opacity: 0.8;
 }
+
+/* Números "+500", "+8", "98%" y sus símbolos, para que se vean del mismo tamaño/alineación */
 .counter,
 .counter-suffix {
     font-family: 'Poppins', sans-serif;
@@ -215,7 +230,9 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 }
 
 
-/* --- preview servicios --- */
+/* ============================================
+   PREVIEW DE SERVICIOS (Inicio y página Servicios)
+   ============================================ */
 .service-card {
     position: relative;
     border-radius: 20px;
@@ -265,7 +282,9 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 }
 
 
-/* --- preview tienda --- */
+/* ============================================
+   PREVIEW DE TIENDA (Inicio y página Tienda)
+   ============================================ */
 .shop-card {
     background: white;
     border-radius: 20px;
@@ -297,7 +316,9 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 }
 
 
-/* --- testimonios --- */
+/* ============================================
+   TESTIMONIOS (Inicio)
+   ============================================ */
 .testimonial-card {
     padding: 2rem 1.5rem;
     transition: transform 0.3s ease;
@@ -327,7 +348,10 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     line-height: 1.6;
 }
 
-/* --- galería --- */
+
+/* ============================================
+   GALERÍA (Inicio)
+   ============================================ */
 .gallery-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -355,7 +379,9 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 }
 
 
-/* --- dashboard admin --- */
+/* ============================================
+   DASHBOARD DEL PANEL ADMIN (/admin-panel/)
+   ============================================ */
 .admin-dashboard {
     display: flex;
     min-height: 100vh;
@@ -477,4 +503,76 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 @media (max-width: 768px) {
     .admin-sidebar { display: none; }
     .admin-main { margin-left: 0; }
+}
+
+
+/* ============================================
+   MODALES DE LOGIN Y REGISTRO
+   (SIN imágenes de banner — solo encabezado con color)
+   ============================================ */
+
+/* Contenedor general del modal: quita el borde y recorta las esquinas redondeadas */
+.auth-card {
+    overflow: hidden;
+    border: none;
+}
+
+/* Botón "X" para cerrar, flotando sobre el encabezado de color */
+.auth-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    background: white;
+    border-radius: 50%;
+    opacity: 1;
+}
+
+/* Encabezado con degradado verde oliva (reemplaza el banner de imagen) */
+.auth-header {
+    background: linear-gradient(135deg, var(--color-olive) 0%, var(--color-olive-dark) 100%);
+    color: white;
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+}
+
+/* Versión más compacta del encabezado, usada en el modal de Registro (formulario más largo) */
+.auth-header-sm {
+    padding: 1.5rem;
+}
+
+.auth-header i {
+    font-size: 1.8rem;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+/* Inputs con ícono a la izquierda (correo, contraseña, teléfono, etc.) */
+.input-icon-group {
+    position: relative;
+}
+
+.input-icon-group i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-olive);
+    font-size: 0.95rem;
+}
+
+.input-icon-group .form-control,
+.input-icon-group .form-select {
+    padding-left: 2.4rem;
+    border-radius: 12px;
+}
+
+/* Cuadro de aviso informativo (usado para avisar al adiestrador que su cuenta queda pendiente) */
+.auth-note {
+    background: rgba(122, 141, 40, 0.1);
+    border: 1px solid rgba(122, 141, 40, 0.25);
+    border-radius: 12px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.8rem;
+    color: var(--color-olive-dark);
 }

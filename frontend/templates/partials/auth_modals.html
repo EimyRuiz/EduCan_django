@@ -1,26 +1,34 @@
 <!-- Modal Login -->
 <div class="modal fade" id="loginModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content rounded-4">
-      <div class="modal-header border-0">
-        <h5 class="modal-title fw-bold">Iniciar sesión</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-content rounded-4 auth-card">
+      <button type="button" class="btn-close auth-close" data-bs-dismiss="modal"></button>
+      <div class="auth-header">
+        <i class="bi bi-heart-fill"></i>
+        <h4 class="fw-bold mb-1">¡Bienvenido de nuevo!</h4>
+        <p class="mb-0 small">Inicia sesión para continuar en EDUCAN</p>
       </div>
-      <div class="modal-body">
+      <div class="modal-body p-4">
         <div id="loginError" class="alert alert-danger d-none"></div>
         <form id="loginForm">
           <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" id="loginEmail" required>
+            <label class="form-label small fw-bold">Correo electrónico</label>
+            <div class="input-icon-group">
+              <i class="bi bi-envelope"></i>
+              <input type="email" class="form-control" id="loginEmail" placeholder="Ingresa tu correo electrónico" required>
+            </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Contraseña</label>
-            <input type="password" class="form-control" id="loginPassword" required>
+          <div class="mb-2">
+            <label class="form-label small fw-bold">Contraseña</label>
+            <div class="input-icon-group">
+              <i class="bi bi-lock"></i>
+              <input type="password" class="form-control" id="loginPassword" placeholder="Ingresa tu contraseña" required>
+            </div>
           </div>
-          <button type="submit" class="btn btn-olive w-100 rounded-pill">Entrar</button>
+          <button type="submit" class="btn btn-olive w-100 rounded-pill mt-3 py-2">Entrar</button>
         </form>
         <p class="text-center small mt-3 mb-0">
-          ¿No tienes cuenta? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Regístrate</a>
+          ¿No tienes cuenta? <a href="#" class="text-olive fw-bold" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Regístrate</a>
         </p>
       </div>
     </div>
@@ -29,45 +37,79 @@
 
 <!-- Modal Registro -->
 <div class="modal fade" id="registerModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content rounded-4">
-      <div class="modal-header border-0">
-        <h5 class="modal-title fw-bold">Crear cuenta</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-4 auth-card">
+      <button type="button" class="btn-close auth-close" data-bs-dismiss="modal"></button>
+      <div class="auth-header auth-header-sm">
+        <i class="bi bi-heart-fill"></i>
+        <h5 class="fw-bold mb-0">¡Crea tu cuenta!</h5>
       </div>
-      <div class="modal-body">
+      <div class="modal-body p-4">
         <div id="registerError" class="alert alert-danger d-none"></div>
+        <div id="registerSuccess" class="alert alert-success d-none"></div>
+
         <form id="registerForm">
-    <div class="row">
-        <div class="col-6 mb-3">
-            <label class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="registerNombre" required>
-        </div>
-        <div class="col-6 mb-3">
-            <label class="form-label">Apellido</label>
-            <input type="text" class="form-control" id="registerApellido" required>
-        </div>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-control" id="registerEmail" required>
-    </div>
-    <div class="row">
-        <div class="col-6 mb-3">
-            <label class="form-label">Teléfono</label>
-            <input type="tel" class="form-control" id="registerTelefono" required>
-        </div>
-        <div class="col-6 mb-3">
-            <label class="form-label">Ciudad</label>
-            <input type="text" class="form-control" id="registerCiudad">
-        </div>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Contraseña</label>
-        <input type="password" class="form-control" id="registerPassword" minlength="6" required>
-    </div>
-    <button type="submit" class="btn btn-olive w-100 rounded-pill">Registrarme</button>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Nombre</label>
+              <div class="input-icon-group">
+                <i class="bi bi-person"></i>
+                <input type="text" class="form-control" id="registerNombre" placeholder="Tu nombre" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Apellido</label>
+              <div class="input-icon-group">
+                <i class="bi bi-person"></i>
+                <input type="text" class="form-control" id="registerApellido" placeholder="Tu apellido" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Correo</label>
+              <div class="input-icon-group">
+                <i class="bi bi-envelope"></i>
+                <input type="email" class="form-control" id="registerEmail" placeholder="Tu correo" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Teléfono</label>
+              <div class="input-icon-group">
+                <i class="bi bi-telephone"></i>
+                <input type="tel" class="form-control" id="registerTelefono" placeholder="Tu teléfono" required>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">Ciudad</label>
+              <div class="input-icon-group">
+                <i class="bi bi-geo-alt"></i>
+                <input type="text" class="form-control" id="registerCiudad" placeholder="Ciudad">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">Rol</label>
+              <select class="form-select" id="registerRol" required>
+                <option value="cliente" selected>Cliente</option>
+                <option value="adiestrador">Adiestrador</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">Contraseña</label>
+              <input type="password" class="form-control" id="registerPassword" placeholder="Contraseña" minlength="6" required>
+            </div>
+
+            <div class="col-12 d-none" id="certificadoWrapper">
+              <div class="auth-note mt-2">
+                <i class="bi bi-info-circle me-1"></i> Como adiestrador, adjunta tu certificado. Tu cuenta quedará pendiente de aprobación.
+              </div>
+              <input type="file" class="form-control mt-2" id="registerCertificado" accept=".pdf,image/*">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-olive w-100 rounded-pill mt-3 py-2">Crear cuenta</button>
         </form>
+        <p class="text-center small mt-2 mb-0">
+          ¿Ya tienes cuenta? <a href="#" class="text-olive fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Inicia sesión</a>
+        </p>
       </div>
     </div>
   </div>

@@ -58,8 +58,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     counters.forEach(counter => observer.observe(counter));
 
+
+
     // --- Login y registro ---
 const API_BASE = 'http://127.0.0.1:8000/api';
+
+
 
 function updateAuthButton() {
     const token = localStorage.getItem('access_token');
@@ -122,13 +126,25 @@ if (loginForm) {
     };
 }
 
+// Mostrar/ocultar certificado según el rol elegido
+const registerRolSelect = document.getElementById('registerRol');
+if (registerRolSelect) {
+    registerRolSelect.onchange = function () {
+        const wrapper = document.getElementById('certificadoWrapper');
+        wrapper.classList.toggle('d-none', this.value !== 'adiestrador');
+    };
+}
+
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
     registerForm.onsubmit = async function (e) {
         e.preventDefault();
         const errorBox = document.getElementById('registerError');
+        const successBox = document.getElementById('registerSuccess');
         errorBox.classList.add('d-none');
+        successBox.classList.add('d-none');
 
+        const rol = document.getElementById('registerRol').value;
         const payload = {
             nombre: document.getElementById('registerNombre').value,
             apellido: document.getElementById('registerApellido').value,
@@ -136,7 +152,7 @@ if (registerForm) {
             telefono: document.getElementById('registerTelefono').value,
             ciudad: document.getElementById('registerCiudad').value,
             password: document.getElementById('registerPassword').value,
-            rol: 'cliente'
+            rol: rol
         };
 
         try {
@@ -153,8 +169,35 @@ if (registerForm) {
                 return;
             }
 
-            alert('Cuenta creada. Ahora inicia sesión.');
-            window.location.reload();
+            if (rol === 'adiestrador') {
+                const certificado = document.getElementById('registerCertificado').files[0];
+
+                const loginRes = await fetch(`${API_BASE}/users/login/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: payload.email, password: payload.password })
+                });
+                const loginResult = await loginRes.json();
+
+                if (certificado && loginRes.ok) {
+                    const formData = new FormData();
+                    formData.append('certificado', certificado);
+                    await fetch(`${API_BASE}/users/upload-certificado/`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${loginResult.access}` },
+                        body: formData
+                    });
+                }
+
+                successBox.textContent = 'Cuenta creada. Tu certificado quedó pendiente de revisión por el administrador.';
+                successBox.classList.remove('d-none');
+                registerForm.reset();
+                return;
+            }
+
+            successBox.textContent = 'Cuenta creada correctamente. Ya puedes iniciar sesión.';
+            successBox.classList.remove('d-none');
+            registerForm.reset();
         } catch (err) {
             errorBox.textContent = 'No se pudo conectar con el servidor.';
             errorBox.classList.remove('d-none');
