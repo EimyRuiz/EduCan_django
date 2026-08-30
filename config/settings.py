@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'apps.shop',
     'apps.training',
     'corsheaders',
+    'apps.requests',
 
 ]
 
