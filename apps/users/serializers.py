@@ -9,7 +9,9 @@ class UserRegisterSerializer(serializers.Serializer):
     ciudad = serializers.CharField(max_length=100, required=False, default='')
     password = serializers.CharField(min_length=6, write_only=True)
     rol = serializers.ChoiceField(choices=['cliente', 'adiestrador'], default='cliente')
-
+    especialidades_solicitadas = serializers.ListField(
+        child=serializers.CharField(), required=False, default=list
+    )
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)

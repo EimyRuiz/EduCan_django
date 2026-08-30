@@ -16,8 +16,6 @@
             <a href="#" class="admin-nav-link" data-section="pendientes"><i class="bi bi-person-check-fill"></i> Adiestradores</a>
             <a href="#" class="admin-nav-link" data-section="servicios"><i class="bi bi-clipboard2-pulse-fill"></i> Servicios</a>
             <a href="#" class="admin-nav-link" data-section="productos"><i class="bi bi-bag-fill"></i> Productos</a>
-            
-            <a href="#" class="admin-nav-link" data-section="configuracion"><i class="bi bi-gear-fill"></i> Configuración</a>
         </nav>
         <a href="/" class="admin-nav-link mt-auto"><i class="bi bi-box-arrow-left"></i> Volver al sitio</a>
     </aside>
@@ -75,10 +73,7 @@
         <section class="admin-section d-none" id="section-pendientes">
             <div class="admin-card">
                 <h6 class="fw-bold mb-3">Adiestradores pendientes de aprobación</h6>
-                <table class="table admin-table">
-                <thead><tr><th>Nombre</th><th>Email</th><th>Certificado</th><th></th></tr></thead>
-                    <tbody id="pendientesBody"></tbody>
-                </table>
+                <div id="pendientesContainer"></div>
             </div>
         </section>
 
@@ -92,8 +87,11 @@
                         <select class="form-select" id="servNombre" required>
                             <option value="" disabled selected>Selecciona un servicio</option>
                             <option value="Adiestramiento básico">Adiestramiento básico</option>
+                            <option value="Cachorros y socialización">Cachorros y socialización</option>
                             <option value="Modificación de conducta">Modificación de conducta</option>
+                            <option value="Ansiedad por separación">Ansiedad por separación</option>
                             <option value="Entrenamiento avanzado">Entrenamiento avanzado</option>
+                            <option value="Agility y deportes caninos">Agility y deportes caninos</option>
                             <option value="Paseos y ejercicio">Paseos y ejercicio</option>
                         </select>
                     </div>
@@ -141,24 +139,6 @@
                     <thead><tr><th>Nombre</th><th>Precio</th><th></th></tr></thead>
                     <tbody id="productosBody"></tbody>
                 </table>
-            </div>
-        </section>
-
-        <!-- Configuración -->
-        <section class="admin-section d-none" id="section-configuracion">
-            <div class="admin-card">
-                <h6 class="fw-bold mb-3">Imágenes del sitio</h6>
-                <form id="configForm">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Banner del login (URL de imagen)</label>
-                        <input class="form-control" id="configLoginBanner" placeholder="https://...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Banner del registro (URL de imagen)</label>
-                        <input class="form-control" id="configRegisterBanner" placeholder="https://...">
-                    </div>
-                 <button class="btn btn-olive">Guardar configuración</button>
-               </form>
             </div>
         </section>
     </main>
@@ -212,33 +192,53 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     cargarUsuarios();
 
-
-    // --- Adiestradores pendientes ---
+    // --- Adiestradores pendientes (con especialidades que ELLOS solicitaron) ---
     function cargarPendientes() {
-    fetch(`${API}/users/list/`, { headers }).then(r => r.json()).then(usuarios => {
-        const pendientes = usuarios.filter(u => u.rol === 'adiestrador' && u.estado_aprobacion === 'pendiente');
-        document.getElementById('pendientesBody').innerHTML = pendientes.length
-            ? pendientes.map(u => `
-                <tr>
-                    <td>${u.nombre} ${u.apellido || ''}</td>
-                    <td>${u.email}</td>
-                    <td>${u.certificado ? `<a href="${u.certificado}" target="_blank">Ver certificado</a>` : 'No adjuntado'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-olive me-1" onclick="aprobarAdiestrador('${u.id}', 'aprobar')">Aprobar</button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="aprobarAdiestrador('${u.id}', 'rechazar')">Rechazar</button>
-                    </td>
-                </tr>`).join('')
-            : '<tr><td colspan="4" class="text-muted">No hay solicitudes pendientes.</td></tr>';
-    });
-}
-cargarPendientes();
+        fetch(`${API}/users/list/`, { headers }).then(r => r.json()).then(usuarios => {
+            const pendientes = usuarios.filter(u => u.rol === 'adiestrador' && u.estado_aprobacion === 'pendiente');
+            const contenedor = document.getElementById('pendientesContainer');
 
-window.aprobarAdiestrador = function (id, accion) {
-    fetch(`${API}/users/aprobar/${id}/`, {
-        method: 'POST', headers,
-        body: JSON.stringify({ accion })
-    }).then(() => { cargarPendientes(); cargarUsuarios(); });
-};
+            if (!pendientes.length) {
+                contenedor.innerHTML = '<p class="text-muted mb-0">No hay solicitudes pendientes.</p>';
+                return;
+            }
+
+            contenedor.innerHTML = pendientes.map(u => `
+                <div class="border rounded-3 p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <strong>${u.nombre} ${u.apellido || ''}</strong><br>
+                            <span class="text-muted small">${u.email}</span>
+                        </div>
+                        ${u.certificado ? `<a href="${u.certificado}" target="_blank" class="btn btn-sm btn-outline-secondary">Ver certificado</a>` : '<span class="text-danger small">Sin certificado</span>'}
+                    </div>
+
+                    <p class="small fw-bold mb-1">Especialidades solicitadas:</p>
+                    <div class="mb-3">
+                        ${(u.especialidades_solicitadas || []).map(esp => `<span class="badge bg-secondary me-1">${esp}</span>`).join('') || '<span class="text-muted small">Ninguna seleccionada</span>'}
+                    </div>
+
+                    <button class="btn btn-sm btn-olive me-1" onclick="aprobarAdiestrador('${u.id}')">Aprobar</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="rechazarAdiestrador('${u.id}')">Rechazar</button>
+                </div>
+            `).join('');
+        });
+    }
+    cargarPendientes();
+
+    window.aprobarAdiestrador = function (id) {
+        fetch(`${API}/users/aprobar/${id}/`, {
+            method: 'POST', headers,
+            body: JSON.stringify({ accion: 'aprobar' })
+        }).then(() => { cargarPendientes(); cargarUsuarios(); });
+    };
+
+    window.rechazarAdiestrador = function (id) {
+        fetch(`${API}/users/aprobar/${id}/`, {
+            method: 'POST', headers,
+            body: JSON.stringify({ accion: 'rechazar' })
+        }).then(() => { cargarPendientes(); cargarUsuarios(); });
+    };
 
     // --- Servicios ---
     function cargarServicios() {
@@ -340,25 +340,6 @@ window.aprobarAdiestrador = function (id, accion) {
         fetch(`${API}/products/${id}/`, { method: 'DELETE', headers }).then(() => cargarProductos());
     };
 });
-
-function cargarConfiguracion() {
-    fetch(`${API}/config/`).then(r => r.json()).then(config => {
-        document.getElementById('configLoginBanner').value = config.login_banner || '';
-        document.getElementById('configRegisterBanner').value = config.register_banner || '';
-    });
-}
-cargarConfiguracion();
-
-document.getElementById('configForm').onsubmit = function (e) {
-    e.preventDefault();
-    fetch(`${API}/config/`, {
-        method: 'POST', headers,
-        body: JSON.stringify({
-            login_banner: document.getElementById('configLoginBanner').value,
-            register_banner: document.getElementById('configRegisterBanner').value
-        })
-    }).then(() => alert('Configuración guardada.'));
-};
 </script>
 {% endblock %}
 {% endblock %}

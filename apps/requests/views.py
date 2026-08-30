@@ -49,36 +49,31 @@ class ServiceRequestListCreateView(APIView):
     permission_classes = [IsMongoAuthenticated]
 
     def get(self, request):
-        # El cliente ve solo sus solicitudes; el admin/adiestrador ven todas
         rol = request.user.get('rol')
+        user_id = request.user.get('user_id')
+
         if rol == 'cliente':
-            solicitudes = list(db.solicitudes.find({'cliente_id': request.user.get('user_id')}))
-        else:
+            solicitudes = list(db.solicitudes.find({'cliente_id': user_id}))
+
+        elif rol == 'adiestrador':
+            usuario = db.usuarios.find_one({'_id': ObjectId(user_id)})
+            especialidades = usuario.get('especialidades', [])
+            solicitudes = list(db.solicitudes.find({
+                '$or': [
+                    # Pendientes que coinciden con su especialidad (disponibles para tomar)
+                    {'estado': 'pendiente', 'servicio': {'$in': especialidades}},
+                    # Las que él mismo ya aceptó (para verlas en su historial)
+                    {'adiestrador_id': user_id},
+                ]
+            }))
+
+        else:  # administrador
             solicitudes = list(db.solicitudes.find())
+
         return Response([serialize_request(s) for s in solicitudes])
 
-    def post(self, request):
-        serializer = ServiceRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
 
-        nueva_solicitud = {
-            **data,
-            'fecha_inicio': data['fecha_inicio'].isoformat(),
-            'cliente_id': request.user.get('user_id'),
-            'cliente_nombre': request.user.get('email'),
-            'adiestrador_id': None,
-            'estado': 'pendiente',  # pendiente | aceptada | rechazada
-            'perro_foto': None,
-            'creado_en': datetime.utcnow().isoformat(),
-        }
-
-        resultado = db.solicitudes.insert_one(nueva_solicitud)
-        return Response(
-            {'mensaje': 'Solicitud creada.', 'id': str(resultado.inserted_id)},
-            status=status.HTTP_201_CREATED
-        )
-
+    
 
 class ServiceRequestDetailView(APIView):
     permission_classes = [IsMongoAuthenticated]
@@ -103,3 +98,26 @@ class ServiceRequestDetailView(APIView):
 
         db.solicitudes.update_one({'_id': ObjectId(pk)}, {'$set': campos_permitidos})
         return Response({'mensaje': 'Solicitud actualizada.'})
+
+
+
+
+class AceptarSolicitudView(APIView):
+    permission_classes = [IsMongoAuthenticated]
+
+    def post(self, request, pk):
+        if request.user.get('rol') != 'adiestrador':
+            return Response({'error': 'Solo un adiestrador puede aceptar solicitudes.'}, status=status.HTTP_403_FORBIDDEN)
+
+        solicitud = db.solicitudes.find_one({'_id': ObjectId(pk)})
+        if not solicitud:
+            return Response({'error': 'No encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if solicitud['estado'] != 'pendiente':
+            return Response({'error': 'Esta solicitud ya fue tomada por otro adiestrador.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        db.solicitudes.update_one(
+            {'_id': ObjectId(pk)},
+            {'$set': {'adiestrador_id': request.user.get('user_id'), 'estado': 'aceptada'}}
+        )
+        return Response({'mensaje': 'Solicitud aceptada.'})

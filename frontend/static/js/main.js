@@ -145,6 +145,9 @@ if (registerForm) {
         successBox.classList.add('d-none');
 
         const rol = document.getElementById('registerRol').value;
+        const especialidadesSeleccionadas = Array.from(
+            document.querySelectorAll('.especialidad-registro:checked')
+        ).map(c => c.value);
         const payload = {
             nombre: document.getElementById('registerNombre').value,
             apellido: document.getElementById('registerApellido').value,
@@ -152,7 +155,8 @@ if (registerForm) {
             telefono: document.getElementById('registerTelefono').value,
             ciudad: document.getElementById('registerCiudad').value,
             password: document.getElementById('registerPassword').value,
-            rol: rol
+            rol: rol,
+            especialidades_solicitadas: especialidadesSeleccionadas
         };
 
         try {

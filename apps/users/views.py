@@ -51,6 +51,8 @@ class RegisterView(APIView):
         if data['rol'] == 'adiestrador':
             nuevo_usuario['estado_aprobacion'] = 'pendiente'
             nuevo_usuario['certificado'] = None
+            nuevo_usuario['especialidades_solicitadas'] = data.get('especialidades_solicitadas', [])
+            nuevo_usuario['especialidades'] = []  # se llenan solo si el admin aprueba
         else:
             nuevo_usuario['estado_aprobacion'] = 'aprobado'
 
@@ -214,11 +216,12 @@ class AprobarAdiestradorView(APIView):
         if request.user.get('rol') != 'administrador':
             return Response({'error': 'No autorizado.'}, status=status.HTTP_403_FORBIDDEN)
 
-        accion = request.data.get('accion')  # 'aprobar' o 'rechazar'
-        nuevo_estado = 'aprobado' if accion == 'aprobar' else 'rechazado'
+        accion = request.data.get('accion')
+        usuario = db.usuarios.find_one({'_id': ObjectId(pk)})
 
-        db.usuarios.update_one(
-            {'_id': ObjectId(pk)},
-            {'$set': {'estado_aprobacion': nuevo_estado}}
-        )
-        return Response({'mensaje': f'Adiestrador {nuevo_estado}.'})        
+        actualizacion = {'estado_aprobacion': 'aprobado' if accion == 'aprobar' else 'rechazado'}
+        if accion == 'aprobar':
+            actualizacion['especialidades'] = usuario.get('especialidades_solicitadas', [])
+
+        db.usuarios.update_one({'_id': ObjectId(pk)}, {'$set': actualizacion})
+        return Response({'mensaje': f'Adiestrador {actualizacion["estado_aprobacion"]}.'})
