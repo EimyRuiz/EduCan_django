@@ -22,3 +22,7 @@ def shop(request):
 
 def admin_panel(request):
     return render(request, 'pages/admin_panel.html')
+
+
+def request_service(request):
+    return render(request, 'pages/request_service.html')

@@ -6,4 +6,5 @@ urlpatterns = [
     path('services/', views.services, name='services'),
     path('shop/', views.shop, name='shop'),
     path('admin-panel/', views.admin_panel, name='admin-panel'),
+    path('solicitar-servicio/', views.request_service, name='request_service'),
 ]

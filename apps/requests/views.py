@@ -60,18 +60,37 @@ class ServiceRequestListCreateView(APIView):
             especialidades = usuario.get('especialidades', [])
             solicitudes = list(db.solicitudes.find({
                 '$or': [
-                    # Pendientes que coinciden con su especialidad (disponibles para tomar)
                     {'estado': 'pendiente', 'servicio': {'$in': especialidades}},
-                    # Las que él mismo ya aceptó (para verlas en su historial)
                     {'adiestrador_id': user_id},
                 ]
             }))
 
-        else:  # administrador
+        else:
             solicitudes = list(db.solicitudes.find())
 
         return Response([serialize_request(s) for s in solicitudes])
 
+    def post(self, request):
+        serializer = ServiceRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        nueva_solicitud = {
+            **data,
+            'fecha_inicio': data['fecha_inicio'].isoformat(),
+            'cliente_id': request.user.get('user_id'),
+            'cliente_nombre': request.user.get('email'),
+            'adiestrador_id': None,
+            'estado': 'pendiente',
+            'perro_foto': None,
+            'creado_en': datetime.utcnow().isoformat(),
+        }
+
+        resultado = db.solicitudes.insert_one(nueva_solicitud)
+        return Response(
+            {'mensaje': 'Solicitud creada.', 'id': str(resultado.inserted_id)},
+            status=status.HTTP_201_CREATED
+        )
 
     
 

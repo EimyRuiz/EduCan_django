@@ -209,4 +209,100 @@ if (registerForm) {
     };
 }
 
+
+
+// --- Solicitud de servicio ---
+const requestForm = document.getElementById('requestForm');
+if (requestForm) {
+    const token = localStorage.getItem('access_token');
+    const rolActual = localStorage.getItem('user_rol');
+
+    if (!token || rolActual !== 'cliente') {
+        document.getElementById('noAuthMsg').classList.remove('d-none');
+    } else {
+        document.getElementById('requestFormWrapper').classList.remove('d-none');
+
+        const reqHeaders = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+        function cargarMisSolicitudes() {
+            fetch(`${API_BASE}/requests/`, { headers: reqHeaders })
+                .then(r => r.json())
+                .then(solicitudes => {
+                    const cont = document.getElementById('misSolicitudes');
+                    if (!solicitudes.length) {
+                        cont.innerHTML = '<p class="text-muted small">Aún no has hecho ninguna solicitud.</p>';
+                        return;
+                    }
+                    const badgeColor = { pendiente: 'bg-warning text-dark', aceptada: 'bg-success', rechazada: 'bg-danger' };
+                    cont.innerHTML = solicitudes.map(s => `
+                        <div class="border rounded-3 p-3 mb-2 d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${s.servicio}</strong> — ${s.perro_nombre}
+                                <div class="text-muted small">Inicio: ${s.fecha_inicio}</div>
+                            </div>
+                            <span class="badge ${badgeColor[s.estado] || 'bg-secondary'}">${s.estado}</span>
+                        </div>
+                    `).join('');
+                });
+        }
+        cargarMisSolicitudes();
+
+        requestForm.onsubmit = async function (e) {
+            e.preventDefault();
+            const errorBox = document.getElementById('requestError');
+            const successBox = document.getElementById('requestSuccess');
+            errorBox.classList.add('d-none');
+            successBox.classList.add('d-none');
+
+            const payload = {
+                servicio: document.getElementById('reqServicio').value,
+                duracion: document.getElementById('reqDuracion').value,
+                fecha_inicio: document.getElementById('reqFecha').value,
+                perro_nombre: document.getElementById('reqPerroNombre').value,
+                perro_raza: document.getElementById('reqPerroRaza').value,
+                perro_edad: parseInt(document.getElementById('reqPerroEdad').value),
+                perro_peso: parseFloat(document.getElementById('reqPerroPeso').value),
+                perro_sexo: document.getElementById('reqPerroSexo').value,
+                perro_esterilizado: document.getElementById('reqPerroEsterilizado').value === 'true',
+                perro_vacunas_al_dia: document.getElementById('reqPerroVacunas').value === 'true',
+                perro_conducta: document.getElementById('reqPerroConducta').value,
+                perro_salud: document.getElementById('reqPerroSalud').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/requests/`, {
+                    method: 'POST', headers: reqHeaders, body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+
+                if (!res.ok) {
+                    errorBox.textContent = result.error || JSON.stringify(result);
+                    errorBox.classList.remove('d-none');
+                    return;
+                }
+
+                // Si adjuntó foto, la subimos aparte
+                const foto = document.getElementById('reqPerroFoto').files[0];
+                if (foto) {
+                    const formData = new FormData();
+                    formData.append('foto', foto);
+                    await fetch(`${API_BASE}/requests/${result.id}/foto/`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                }
+
+                successBox.textContent = 'Solicitud enviada correctamente.';
+                successBox.classList.remove('d-none');
+                requestForm.reset();
+                cargarMisSolicitudes();
+            } catch (err) {
+                errorBox.textContent = 'No se pudo conectar con el servidor.';
+                errorBox.classList.remove('d-none');
+            }
+        };
+    }
+}
+
 });
