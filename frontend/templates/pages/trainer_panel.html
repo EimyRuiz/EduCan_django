@@ -1,0 +1,134 @@
+{% extends 'layouts/base_admin.html' %}
+{% block title %}Panel Adiestrador | EDUCAN{% endblock %}
+
+{% block content %}
+<div id="noAccess" class="alert alert-danger d-none m-5">No tienes permiso para ver esta página.</div>
+<div id="noAprobado" class="alert alert-warning d-none m-5">Tu cuenta de adiestrador aún está pendiente de aprobación.</div>
+
+<div id="trainerContent" class="admin-dashboard d-none">
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <i class="bi bi-heart-fill me-1"></i> EDUCAN
+        </div>
+        <nav class="admin-nav">
+            <a href="#" class="admin-nav-link active" data-section="disponibles"><i class="bi bi-list-check"></i> Solicitudes disponibles</a>
+            <a href="#" class="admin-nav-link" data-section="agenda"><i class="bi bi-calendar-week"></i> Mi agenda</a>
+        </nav>
+        <a href="/" class="admin-nav-link mt-auto"><i class="bi bi-box-arrow-left"></i> Volver al sitio</a>
+    </aside>
+
+    <main class="admin-main">
+        <div class="admin-topbar">
+            <div>
+                <h4 class="fw-bold mb-0" id="welcomeText">Bienvenido</h4>
+                <span class="text-muted small">Panel de adiestrador</span>
+            </div>
+            <div class="admin-avatar" id="adminAvatar">A</div>
+        </div>
+
+        <!-- Solicitudes disponibles (según su especialidad) -->
+        <section class="admin-section" id="section-disponibles">
+            <div class="admin-card">
+                <h6 class="fw-bold mb-3">Solicitudes disponibles para ti</h6>
+                <div id="disponiblesContainer"></div>
+            </div>
+        </section>
+
+        <!-- Mi agenda (las que ya aceptó) -->
+        <section class="admin-section d-none" id="section-agenda">
+            <div class="admin-card">
+                <h6 class="fw-bold mb-3">Servicios que ya aceptaste</h6>
+                <div id="agendaContainer"></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const rol = localStorage.getItem('user_rol');
+    const token = localStorage.getItem('access_token');
+    const nombre = localStorage.getItem('user_nombre') || 'Adiestrador';
+
+    if (rol !== 'adiestrador') {
+        document.getElementById('noAccess').classList.remove('d-none');
+        return;
+    }
+
+    document.getElementById('trainerContent').classList.remove('d-none');
+    document.getElementById('welcomeText').textContent = 'Bienvenido, ' + nombre;
+    document.getElementById('adminAvatar').textContent = nombre.charAt(0).toUpperCase();
+
+    document.querySelectorAll('.admin-nav-link[data-section]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelectorAll('.admin-nav-link[data-section]').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('d-none'));
+            document.getElementById('section-' + this.dataset.section).classList.remove('d-none');
+        });
+    });
+
+    const API = 'http://127.0.0.1:8000/api';
+    const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+    function cargarSolicitudes() {
+        fetch(`${API}/requests/`, { headers })
+            .then(r => r.json())
+            .then(solicitudes => {
+                const disponibles = solicitudes.filter(s => s.estado === 'pendiente');
+                const mias = solicitudes.filter(s => s.estado === 'aceptada');
+
+                const contDisp = document.getElementById('disponiblesContainer');
+                contDisp.innerHTML = disponibles.length
+                    ? disponibles.map(renderSolicitudDisponible).join('')
+                    : '<p class="text-muted mb-0">No hay solicitudes disponibles en tus especialidades por ahora.</p>';
+
+                const contAgenda = document.getElementById('agendaContainer');
+                contAgenda.innerHTML = mias.length
+                    ? mias.sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio)).map(renderSolicitudAgenda).join('')
+                    : '<p class="text-muted mb-0">Aún no tienes servicios aceptados.</p>';
+            });
+    }
+    cargarSolicitudes();
+
+    function renderSolicitudDisponible(s) {
+        return `
+            <div class="border rounded-3 p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${s.servicio}</strong>
+                        <div class="text-muted small">Duración: ${s.duracion} · Inicio deseado: ${s.fecha_inicio}</div>
+                    </div>
+                    <button class="btn btn-sm btn-olive" onclick="aceptarSolicitud('${s.id}')">Aceptar</button>
+                </div>
+                <hr>
+                <p class="small mb-1"><strong>Perro:</strong> ${s.perro_nombre} (${s.perro_raza}, ${s.perro_edad} años, ${s.perro_peso}kg, ${s.perro_sexo})</p>
+                ${s.perro_conducta ? `<p class="small mb-1"><strong>Conducta:</strong> ${s.perro_conducta}</p>` : ''}
+                ${s.perro_salud ? `<p class="small mb-0"><strong>Salud:</strong> ${s.perro_salud}</p>` : ''}
+            </div>`;
+    }
+
+    function renderSolicitudAgenda(s) {
+        return `
+            <div class="border rounded-3 p-3 mb-3">
+                <strong>${s.servicio}</strong> — ${s.perro_nombre}
+                <div class="text-muted small">Inicio: ${s.fecha_inicio} · Duración: ${s.duracion}</div>
+            </div>`;
+    }
+
+    window.aceptarSolicitud = function (id) {
+        fetch(`${API}/requests/${id}/aceptar/`, { method: 'POST', headers })
+            .then(r => r.json())
+            .then(result => {
+                if (result.error) {
+                    alert(result.error);
+                }
+                cargarSolicitudes();
+            });
+    };
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -26,3 +26,7 @@ def admin_panel(request):
 
 def request_service(request):
     return render(request, 'pages/request_service.html')
+
+
+def trainer_panel(request):
+    return render(request, 'pages/trainer_panel.html')
