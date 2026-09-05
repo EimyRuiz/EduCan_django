@@ -31,7 +31,7 @@
             <div class="admin-avatar" id="adminAvatar">A</div>
         </div>
 
-        <!-- Resumen -->
+        <!-- Resumen: tarjetas de conteo general -->
         <section class="admin-section" id="section-resumen">
             <div class="row g-4 mb-4">
                 <div class="col-md-4">
@@ -59,7 +59,7 @@
             </div>
         </section>
 
-        <!-- Usuarios -->
+        <!-- Usuarios: listado general de todos los usuarios registrados -->
         <section class="admin-section d-none" id="section-usuarios">
             <div class="admin-card">
                 <h6 class="fw-bold mb-3">Usuarios registrados</h6>
@@ -70,7 +70,7 @@
             </div>
         </section>
 
-        <!-- Adiestradores pendientes -->
+        <!-- Adiestradores pendientes: aprobar/rechazar según especialidades que ELLOS solicitaron -->
         <section class="admin-section d-none" id="section-pendientes">
             <div class="admin-card">
                 <h6 class="fw-bold mb-3">Adiestradores pendientes de aprobación</h6>
@@ -78,7 +78,7 @@
             </div>
         </section>
 
-        <!-- Calendario de servicios -->
+        <!-- Calendario de servicios aceptados, coloreado según su duración -->
         <section class="admin-section d-none" id="section-calendario">
             <div class="admin-card">
                 <h6 class="fw-bold mb-3">Calendario de servicios</h6>
@@ -92,7 +92,7 @@
             </div>
         </section>
 
-        <!-- Servicios -->
+        <!-- Servicios: crear/editar/eliminar -->
         <section class="admin-section d-none" id="section-servicios">
             <div class="admin-card mb-4">
                 <h6 class="fw-bold mb-3">Agregar / editar servicio</h6>
@@ -124,15 +124,17 @@
             </div>
         </section>
 
-        <!-- Productos -->
+        <!-- Productos: crear/editar/eliminar. Nombre y categoría van separados
+             (nombre = texto libre real del producto, categoría = para filtrar en la tienda) -->
         <section class="admin-section d-none" id="section-productos">
             <div class="admin-card mb-4">
                 <h6 class="fw-bold mb-3">Agregar / editar producto</h6>
                 <form id="productoForm" class="row g-2">
                     <input type="hidden" id="prodId" value="">
+                    <div class="col-md-3"><input class="form-control" placeholder="Nombre del producto" id="prodNombre" required></div>
                     <div class="col-md-3">
-                        <select class="form-select" id="prodNombre" required>
-                            <option value="" disabled selected>Selecciona un producto</option>
+                        <select class="form-select" id="prodCategoria" required>
+                            <option value="" disabled selected>Categoría</option>
                             <option value="Collar">Collar</option>
                             <option value="Pechera">Pechera</option>
                             <option value="Correa">Correa</option>
@@ -143,9 +145,9 @@
                             <option value="Accesorio">Accesorio</option>
                         </select>
                     </div>
-                    <div class="col-md-4"><input class="form-control" placeholder="Descripción" id="prodDescripcion" required></div>
+                    <div class="col-md-3"><input class="form-control" placeholder="Descripción" id="prodDescripcion" required></div>
                     <div class="col-md-2"><input class="form-control" type="number" placeholder="Precio" id="prodPrecio" required></div>
-                    <div class="col-md-3"><button class="btn btn-olive w-100" id="prodSubmitBtn">Agregar</button></div>
+                    <div class="col-md-1"><button class="btn btn-olive w-100" id="prodSubmitBtn">Agregar</button></div>
                 </form>
             </div>
             <div class="admin-card">
@@ -168,6 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('access_token');
     const nombre = localStorage.getItem('user_nombre') || 'Admin';
 
+    // Solo el administrador puede ver este panel
     if (rol !== 'administrador') {
         document.getElementById('noAccess').classList.remove('d-none');
         return;
@@ -176,27 +179,32 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('welcomeText').textContent = 'Bienvenido, ' + nombre;
     document.getElementById('adminAvatar').textContent = nombre.charAt(0).toUpperCase();
 
-    // Navegación entre secciones
-    let calendarioIniciado = false;
+    // ============================================
+    // Navegación entre secciones del sidebar
+    // ============================================
+    let calendarioIniciado = false; // FullCalendar solo se debe inicializar una vez
     document.querySelectorAll('.admin-nav-link[data-section]').forEach(link => {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelectorAll('.admin-nav-link[data-section]').forEach(l => l.classList.remove('active'));
-        this.classList.add('active');
-        document.querySelectorAll('.admin-section').forEach(s => s.classList.add('d-none'));
-        document.getElementById('section-' + this.dataset.section).classList.remove('d-none');
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelectorAll('.admin-nav-link[data-section]').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('d-none'));
+            document.getElementById('section-' + this.dataset.section).classList.remove('d-none');
 
-        if (this.dataset.section === 'calendario' && !calendarioIniciado) {
-            cargarCalendario();
-            calendarioIniciado = true;
-        }
+            // El calendario se renderiza solo cuando el usuario entra a esa sección por primera vez
+            if (this.dataset.section === 'calendario' && !calendarioIniciado) {
+                cargarCalendario();
+                calendarioIniciado = true;
+            }
+        });
     });
-});
 
     const API = 'http://127.0.0.1:8000/api';
     const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 
-    // --- Usuarios ---
+    // ============================================
+    // Usuarios
+    // ============================================
     function cargarUsuarios() {
         fetch(`${API}/users/list/`, { headers })
             .then(r => { if (!r.ok) throw new Error('Status ' + r.status); return r.json(); })
@@ -213,7 +221,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     cargarUsuarios();
 
-    // --- Adiestradores pendientes (con especialidades que ELLOS solicitaron) ---
+    // ============================================
+    // Adiestradores pendientes de aprobación
+    // ============================================
     function cargarPendientes() {
         fetch(`${API}/users/list/`, { headers }).then(r => r.json()).then(usuarios => {
             const pendientes = usuarios.filter(u => u.rol === 'adiestrador' && u.estado_aprobacion === 'pendiente');
@@ -261,44 +271,48 @@ document.addEventListener('DOMContentLoaded', function () {
         }).then(() => { cargarPendientes(); cargarUsuarios(); });
     };
 
-    // Colores para la duración de los servicios CALENDARIO
+    // ============================================
+    // Calendario (FullCalendar) — solicitudes aceptadas, coloreadas por duración
+    // ============================================
     const COLOR_DURACION = {
-    corto: '#2ecc71',
-    mediano: '#3498db',
-    largo: '#f39c12',
-    muy_largo: '#e74c3c'
-};
+        corto: '#2ecc71',
+        mediano: '#3498db',
+        largo: '#f39c12',
+        muy_largo: '#e74c3c'
+    };
 
-function cargarCalendario() {
-    fetch(`${API}/requests/`, { headers }).then(r => r.json()).then(solicitudes => {
-        const eventos = solicitudes
-            .filter(s => s.estado === 'aceptada')
-            .map(s => ({
-                title: `${s.servicio} — ${s.perro_nombre}`,
-                start: s.fecha_inicio,
-                color: COLOR_DURACION[s.duracion] || '#999',
-                extendedProps: { cliente: s.cliente_nombre, servicio: s.servicio }
-            }));
+    function cargarCalendario() {
+        fetch(`${API}/requests/`, { headers }).then(r => r.json()).then(solicitudes => {
+            const eventos = solicitudes
+                .filter(s => s.estado === 'aceptada')
+                .map(s => ({
+                    title: `${s.servicio} — ${s.perro_nombre}`,
+                    start: s.fecha_inicio,
+                    color: COLOR_DURACION[s.duracion] || '#999',
+                    extendedProps: { cliente: s.cliente_nombre, servicio: s.servicio }
+                }));
 
-        const calendarEl = document.getElementById('calendarioServicios');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            events: eventos,
-            eventClick: function (info) {
-                alert(`Servicio: ${info.event.extendedProps.servicio}\nCliente: ${info.event.extendedProps.cliente}`);
-            },
-            height: 650
+            const calendarEl = document.getElementById('calendarioServicios');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: eventos,
+                eventClick: function (info) {
+                    alert(`Servicio: ${info.event.extendedProps.servicio}\nCliente: ${info.event.extendedProps.cliente}`);
+                },
+                height: 650
+            });
+            calendar.render();
         });
-        calendar.render();
-    });
-}
+    }
 
-    // --- Servicios ---
+    // ============================================
+    // Servicios: listar, crear, editar, eliminar
+    // ============================================
     function cargarServicios() {
         fetch(`${API}/services/`).then(r => r.json()).then(servicios => {
             document.getElementById('statServicios').textContent = servicios.length;
@@ -348,7 +362,9 @@ function cargarCalendario() {
         fetch(`${API}/services/${id}/`, { method: 'DELETE', headers }).then(() => cargarServicios());
     };
 
-    // --- Productos ---
+    // ============================================
+    // Productos: listar, crear, editar, eliminar (con nombre + categoría separados)
+    // ============================================
     function cargarProductos() {
         fetch(`${API}/products/`).then(r => r.json()).then(productos => {
             document.getElementById('statProductos').textContent = productos.length;
@@ -369,6 +385,7 @@ function cargarCalendario() {
     window.editarProducto = function (producto) {
         document.getElementById('prodId').value = producto.id;
         document.getElementById('prodNombre').value = producto.nombre;
+        document.getElementById('prodCategoria').value = producto.categoria;
         document.getElementById('prodDescripcion').value = producto.descripcion;
         document.getElementById('prodPrecio').value = producto.precio;
         document.getElementById('prodSubmitBtn').textContent = 'Guardar cambios';
@@ -379,6 +396,7 @@ function cargarCalendario() {
         const id = document.getElementById('prodId').value;
         const datos = {
             nombre: document.getElementById('prodNombre').value,
+            categoria: document.getElementById('prodCategoria').value,
             descripcion: document.getElementById('prodDescripcion').value,
             precio: parseFloat(document.getElementById('prodPrecio').value)
         };

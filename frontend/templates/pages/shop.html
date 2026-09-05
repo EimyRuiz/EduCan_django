@@ -7,7 +7,7 @@
 
 <section class="page-header">
     <div class="page-header-overlay"></div>
-    <div class="container position-relative text-center text-white py-5">
+    <div class="container position-relative text-center text-white py-3">
         <p class="text-uppercase fw-bold small mb-2" style="letter-spacing: 2px;">Tienda</p>
         <h1 class="fw-bold display-5">Nuestros productos</h1>
     </div>
@@ -15,9 +15,33 @@
 
 <section class="py-5 my-4">
     <div class="container">
-        <div class="row g-4">
+
+        <!-- Filtros -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="input-icon-group">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" id="buscarProducto" placeholder="Buscar producto...">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <select class="form-select" id="filtroCategoria">
+                    <option value="">Todas las categorías</option>
+                    <option value="Collar">Collar</option>
+                    <option value="Pechera">Pechera</option>
+                    <option value="Correa">Correa</option>
+                    <option value="Impermeable">Impermeable</option>
+                    <option value="Juguete">Juguete</option>
+                    <option value="Comida">Comida</option>
+                    <option value="Producto de aseo">Producto de aseo</option>
+                    <option value="Accesorio">Accesorio</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-4" id="productosGrid">
             {% for p in productos %}
-            <div class="col-md-4">
+            <div class="col-md-4 producto-item" data-categoria="{{ p.categoria }}">
                 <div class="shop-card">
                     <div class="shop-card-img">
                         <img src="{{ p.imagen|default:'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500' }}" alt="{{ p.nombre }}">
@@ -34,6 +58,9 @@
             <p class="text-center text-muted">Aún no hay productos registrados.</p>
             {% endfor %}
         </div>
+
+        <p class="text-center text-muted mt-4 d-none" id="sinResultados">No se encontraron productos con esos criterios.</p>
+
     </div>
 </section>
 

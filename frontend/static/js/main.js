@@ -241,6 +241,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
+
+    // --- Filtro y búsqueda de la tienda ---
+const buscarProducto = document.getElementById('buscarProducto');
+const filtroCategoria = document.getElementById('filtroCategoria');
+
+if (buscarProducto && filtroCategoria) {
+    function filtrarProductos() {
+        const texto = buscarProducto.value.toLowerCase();
+        const categoria = filtroCategoria.value;
+        let visibles = 0;
+
+        document.querySelectorAll('.producto-item').forEach(item => {
+            const nombre = item.querySelector('h5').textContent.toLowerCase();
+            const coincideTexto = nombre.includes(texto);
+            const coincideCategoria = !categoria || item.dataset.categoria === categoria;
+
+            const mostrar = coincideTexto && coincideCategoria;
+            item.classList.toggle('d-none', !mostrar);
+            if (mostrar) visibles++;
+        });
+        document.getElementById('sinResultados').classList.toggle('d-none', visibles > 0);
+    }
+
+    buscarProducto.addEventListener('input', filtrarProductos);
+    filtroCategoria.addEventListener('change', filtrarProductos);
+}
+
+
     // ============================================
     // SOLICITUD DE SERVICIO (página /solicitar-servicio/)
     // Solo la usa un cliente logueado
